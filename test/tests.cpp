@@ -2,7 +2,7 @@
 #include "../dispatcher.h"
 #include <gtest/gtest.h>
 
-// global auxiliar variables
+// global auxiliar variables to test the callbacks
 short idResult(-1);
 int intResult(-1);
 float floatResult(-1);
@@ -15,6 +15,11 @@ enum MessageTypes {
     STRING,
     STRUCT,
     NUMBER_OF_MESSAGE_TYPES
+};
+
+enum Priority {
+    NORMAL = 0,
+    HIGH
 };
 
 struct TestClass {
@@ -38,12 +43,20 @@ struct TestClass {
         stringResult = "unsubscribe_test";
     }
 
+    static void priorityTestNormal(Message msg){
+        intResult = *(int*)msg.getData();
+    }
+
+    static void priorityTestHigh(Message msg){
+        intResult = *(int*)msg.getData() + 1;
+    }
+
 };
 
 // test integer as callback message data
-TEST(PubSub, IntMessageTest){
+TEST(MessageParameter, IntMessageTest){
     auto d = Dispatcher::Instance();
-    int data(6), id(MessageTypes::INT);
+    int data(-6), id(MessageTypes::INT);
     Message m(id, sizeof(data), &data);
     d->Subscribe("IntMessageTest", &TestClass::intMessageTest);
     d->Publish("IntMessageTest", m);
@@ -52,7 +65,7 @@ TEST(PubSub, IntMessageTest){
 }
 
 // test float as callback message data
-TEST(PubSub, FloatMessageTest){
+TEST(MessageParameter, FloatMessageTest){
     auto d = Dispatcher::Instance();
     TestClass testClass;
     int id(MessageTypes::FLOAT); float data(4.5);
@@ -64,7 +77,7 @@ TEST(PubSub, FloatMessageTest){
 }
 
 // test std::string as callback message data
-TEST(PubSub, StringMessageTest){
+TEST(MessageParameter, StringMessageTest){
     auto d = Dispatcher::Instance();
     std::string str("string_test");
     int id(MessageTypes::STRING);
@@ -76,7 +89,7 @@ TEST(PubSub, StringMessageTest){
 }
 
 // test unsubscription of callback function
-TEST(PubSub, UnsubscribeTest){
+TEST(UnsubscribeTest, UnsubscribeTest){
     auto d = Dispatcher::Instance();
     TestClass testClass;
     short token = d->Subscribe("UnsubscribeTest", std::bind(&TestClass::unsubscribeTest, &testClass, std::placeholders::_1));
@@ -84,6 +97,28 @@ TEST(PubSub, UnsubscribeTest){
     Message m(MessageTypes::NONE, 0, NULL);
     d->Publish("UnsubscribeTest", m);
     ASSERT_STRNE(stringResult, "unsubscribe_test");
+}
+
+// test callbacks priority
+TEST(PriorityTest, PriorityTest){
+    auto d = Dispatcher::Instance();
+    d->Subscribe("PriorityTest", &TestClass::priorityTestNormal, NORMAL);
+    d->Subscribe("PriorityTest", &TestClass::priorityTestHigh, HIGH);
+    int data(13);
+    Message msg(MessageTypes::INT, sizeof(int), &data);
+    d->Publish("PriorityTest", msg);
+    ASSERT_EQ(intResult, data);
+}
+
+// test reset callbacks map
+TEST(ResetTest, ResetTest){
+    auto d = Dispatcher::Instance();
+    int data(11); intResult = data; data++;
+    d->Subscribe("ResetTest", &TestClass::intMessageTest);
+    Message msg(MessageTypes::INT, sizeof(int), &data);
+    d->Reset();
+    d->Publish("ResetTest", msg);
+    ASSERT_EQ(intResult, data-1);
 }
 
 int main(int argc, char** argv)

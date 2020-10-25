@@ -13,13 +13,13 @@ public:
     static Dispatcher* Instance();
 
     // add callback method to desired event
-    short Subscribe(const std::string& event, FunctionPtr method);
+    short Subscribe(const std::string& event, FunctionPtr method, const short& priority = 0);
 
     // publish event with desired message
     void Publish(const std::string& event, const Message& arg);
 
     // remove callback from desired event
-    void Unsubscribe(const std::string& event, short id);
+    void Unsubscribe(const std::string& event, const short id);
 
     // reset all events and subscriptions
     void Reset();

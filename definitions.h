@@ -9,6 +9,8 @@
 #include <iostream>
 #include <algorithm>
 
+#define BUFFER_SIZE 200
+
 typedef unsigned char byte;
 
 // message struct to pass between callbacks
@@ -17,27 +19,27 @@ class Message{
     #pragma pack(1)
     short m_id;    // message identifier (2 bytes)
     short m_len;   // message size (2 bytes)
-    void* m_data;  // pointer to generic data (m_len bytes)
+    byte m_data[BUFFER_SIZE];  // byte array to keep generic data (BUFFER_SIZE bytes)
     #pragma pack()
 
 public:
 
     Message(short id, short len, const void* data) : m_id(id), m_len(len)
     {
-        m_data = malloc(m_len);
-        memcpy(m_data, data, m_len);
+        memset(&m_data[0], 0, BUFFER_SIZE);
+        memcpy(&m_data[0], data, m_len);
     }
 
     void Print()
     {
         std::cout << "Msg ID:" << m_id << " Msg Size:" << m_len << " Msg Content:";
-        for(int i(0); i<m_len; i++) printf("[%X]", ((byte*)m_data)[i]);
+        for(int i(0); i < m_len; i++) printf("[%X]", m_data[i]);
         std::cout << std::endl;
     }
 
     short getMsgID() const{return m_id;}
     short getMsgSize() const{return m_len;}
-    const void* getData(){return m_data;}
+    const void* getData(){return &m_data[0];}
 
 };
 
@@ -48,10 +50,12 @@ typedef std::function<void(const Message&)> FunctionPtr;
 class Callback{
   FunctionPtr m_method;
   short m_id;
+  short m_priority;
 public:
-  Callback(FunctionPtr method, short id) : m_method(method), m_id(id){}
+  Callback(FunctionPtr method, short id, short priority) : m_method(method), m_id(id), m_priority(priority){}
   const FunctionPtr getMethod(){return m_method;}
   short getID() const{return m_id;}
+  short getPriority() const{return m_priority;}
 };
 
 // data structure to map the events and callback registrations

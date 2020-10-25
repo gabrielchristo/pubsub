@@ -14,9 +14,9 @@ Dispatcher::Dispatcher()
 {
 }
 
-short Dispatcher::Subscribe(const std::string& event, FunctionPtr function)
+short Dispatcher::Subscribe(const std::string& event, FunctionPtr function, const short& priority)
 {
-    m_callbacks[event].push_back(Callback(function, functionID));
+    m_callbacks[event].push_back(Callback(function, functionID, priority));
     return functionID++;
 }
 
@@ -45,7 +45,12 @@ void Dispatcher::Print()
 void Dispatcher::Publish(const std::string& event, const Message& arg)
 {
     auto list = m_callbacks[event];
-    std::for_each(list.begin(), list.end(), [&arg](Callback callback){
-        (callback.getMethod())(arg);
+
+    std::sort(list.begin(), list.end(), [](Callback cbLeft, Callback cbRight){
+       return cbLeft.getPriority() > cbRight.getPriority();
+    });
+
+    std::for_each(list.begin(), list.end(), [&arg](Callback cb){
+        (cb.getMethod())(arg);
     });
 }

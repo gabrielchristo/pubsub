@@ -31,10 +31,13 @@ Furthermore you must pass the std::placeholder::_1 argument, which represents th
 Class m_class;
 short token = pubsub->Subscribe("event", std::bind(&Class::callbackFunction, &m_class, std::placeholders::_1));
 ```
+### Publish ###
 
-### TODO ###
-- set/get notify enabled
-- use fixed-size buffer instead void pointer
-- add tests: struct data, reset, callback order
-- callback priority
-- publish on readme
+To dispatch you must create a message and publish to desired events
+
+```
+int msgType = MsgEnum::MyStructType;
+MyStruct myStruct;
+Message msg(msgType, sizeof(MyStruct), &myStruct);
+pubsub->Publish("event", msg);
+```
