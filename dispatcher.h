@@ -21,6 +21,9 @@ public:
     // remove callback from desired event
     void Unsubscribe(const std::string& event, short id);
 
+    // reset all events and subscriptions
+    void Reset();
+
 private:
 
     Dispatcher();

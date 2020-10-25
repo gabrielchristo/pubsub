@@ -30,6 +30,11 @@ void Dispatcher::Unsubscribe(const std::string& event, short id)
     });
 }
 
+void Dispatcher::Reset()
+{
+    m_callbacks.clear();
+}
+
 void Dispatcher::Publish(const std::string& event, Message *arg)
 {
     auto list = m_callbacks[event];
