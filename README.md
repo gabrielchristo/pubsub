@@ -12,8 +12,18 @@ Using google unit test framework (requires pthread)
 git clone https://github.com/google/googletest/
 cd googletest && mkdir build && cd build && cmake ../ && make
 ```
+### Callback ###
 
-### Static Methods ###
+Every callback method must have the following signature
+
+```
+void callbackMethod(const Message& msg)
+{
+    ...
+}
+```
+
+### Static Callback Methods ###
 
 For static methods you just need to pass the function pointer to the Subscribe call
 
@@ -21,15 +31,13 @@ For static methods you just need to pass the function pointer to the Subscribe c
 short token = pubsub->Subscribe("event", &Class::callbackFunction);
 ```
 
-### Non-Static Methods ###
+### Non-Static Callback Methods ###
 
-In this case you must bind the function pointer to the caller object instance pointer
-
-Furthermore you must pass the std::placeholder::_1 argument, which represents the fixed Message parameter
+In this case you must pass the function pointer and the caller object instance pointer
 
 ```
 Class m_class;
-short token = pubsub->Subscribe("event", std::bind(&Class::callbackFunction, &m_class, std::placeholders::_1));
+short token = pubsub->Subscribe("event", &Class::callbackFunction, &m_class);
 ```
 ### Publish ###
 

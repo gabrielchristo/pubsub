@@ -24,30 +24,30 @@ enum Priority {
 
 struct TestClass {
 
-    static void intMessageTest(Message msg) {
+    static void intMessageTest(const Message& msg) {
         intResult = *reinterpret_cast<const int*>(msg.getData());
         idResult = msg.getMsgID();
     }
 
-    void floatMessageTest(Message msg) {
+    void floatMessageTest(const Message& msg) {
         floatResult = *reinterpret_cast<const float*>(msg.getData());
         idResult = msg.getMsgID();
     }
 
-    static void stringMessageTest(Message msg){
+    static void stringMessageTest(const Message& msg){
         stringResult = reinterpret_cast<const std::string*>(msg.getData())->c_str();
         idResult = msg.getMsgID();
     }
 
-    void unsubscribeTest(Message msg){
+    void unsubscribeTest(const Message& msg){
         stringResult = "unsubscribe_test";
     }
 
-    static void priorityTestNormal(Message msg){
+    static void priorityTestNormal(const Message& msg){
         intResult = *(int*)msg.getData();
     }
 
-    static void priorityTestHigh(Message msg){
+    static void priorityTestHigh(const Message& msg){
         intResult = *(int*)msg.getData() + 1;
     }
 
@@ -70,7 +70,7 @@ TEST(MessageParameter, FloatMessageTest){
     TestClass testClass;
     int id(MessageTypes::FLOAT); float data(4.5);
     Message m(id, sizeof(data), &data);
-    d->Subscribe("FloatMessageTest", std::bind(&TestClass::floatMessageTest, &testClass, std::placeholders::_1));
+    d->Subscribe("FloatMessageTest", &TestClass::floatMessageTest, &testClass);
     d->Publish("FloatMessageTest", m);
     ASSERT_FLOAT_EQ(floatResult, data);
     ASSERT_EQ(idResult, id);
@@ -92,7 +92,7 @@ TEST(MessageParameter, StringMessageTest){
 TEST(UnsubscribeTest, UnsubscribeTest){
     auto d = Dispatcher::Instance();
     TestClass testClass;
-    short token = d->Subscribe("UnsubscribeTest", std::bind(&TestClass::unsubscribeTest, &testClass, std::placeholders::_1));
+    short token = d->Subscribe("UnsubscribeTest", &TestClass::unsubscribeTest, &testClass);
     d->Unsubscribe("UnsubscribeTest", token);
     Message m(MessageTypes::NONE, 0, NULL);
     d->Publish("UnsubscribeTest", m);

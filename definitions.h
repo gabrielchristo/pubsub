@@ -30,7 +30,7 @@ public:
         memcpy(&m_data[0], data, m_len);
     }
 
-    void Print()
+    void Print() const
     {
         std::cout << "Msg ID:" << m_id << " Msg Size:" << m_len << " Msg Content:";
         for(int i(0); i < m_len; i++) printf("[%X]", m_data[i]);
@@ -39,7 +39,7 @@ public:
 
     short getMsgID() const{return m_id;}
     short getMsgSize() const{return m_len;}
-    const void* getData(){return &m_data[0];}
+    const void* getData() const{return &m_data[0];}
 
 };
 

@@ -15,6 +15,14 @@ public:
     // add callback method to desired event
     short Subscribe(const std::string& event, FunctionPtr method, const short& priority = 0);
 
+    // overload to generic callback on non static member functions
+    template<typename T>
+    short Subscribe(const std::string& event, void(T::*method)(const Message&), T* instance, const short& priority = 0)
+    {
+        auto bind = std::bind(method, instance, std::placeholders::_1);
+        return Subscribe(event, bind, priority);
+    }
+
     // publish event with desired message
     void Publish(const std::string& event, const Message& arg);
 
