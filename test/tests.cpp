@@ -19,22 +19,22 @@ enum MessageTypes {
 
 struct TestClass {
 
-    static void intMessageTest(Message* msg) {
-        intResult = *reinterpret_cast<const int*>(msg->getData());
-        idResult = msg->getMsgID();
+    static void intMessageTest(Message msg) {
+        intResult = *reinterpret_cast<const int*>(msg.getData());
+        idResult = msg.getMsgID();
     }
 
-    void floatMessageTest(Message* msg) {
-        floatResult = *reinterpret_cast<const float*>(msg->getData());
-        idResult = msg->getMsgID();
+    void floatMessageTest(Message msg) {
+        floatResult = *reinterpret_cast<const float*>(msg.getData());
+        idResult = msg.getMsgID();
     }
 
-    static void stringMessageTest(Message* msg){
-        stringResult = reinterpret_cast<const std::string*>(msg->getData())->c_str();
-        idResult = msg->getMsgID();
+    static void stringMessageTest(Message msg){
+        stringResult = reinterpret_cast<const std::string*>(msg.getData())->c_str();
+        idResult = msg.getMsgID();
     }
 
-    void unsubscribeTest(Message* msg){
+    void unsubscribeTest(Message msg){
         stringResult = "unsubscribe_test";
     }
 
@@ -46,7 +46,7 @@ TEST(PubSub, IntMessageTest){
     int data(6), id(MessageTypes::INT);
     Message m(id, sizeof(data), &data);
     d->Subscribe("IntMessageTest", &TestClass::intMessageTest);
-    d->Publish("IntMessageTest", &m);
+    d->Publish("IntMessageTest", m);
     ASSERT_EQ(intResult, data);
     ASSERT_EQ(idResult, id);
 }
@@ -58,7 +58,7 @@ TEST(PubSub, FloatMessageTest){
     int id(MessageTypes::FLOAT); float data(4.5);
     Message m(id, sizeof(data), &data);
     d->Subscribe("FloatMessageTest", std::bind(&TestClass::floatMessageTest, &testClass, std::placeholders::_1));
-    d->Publish("FloatMessageTest", &m);
+    d->Publish("FloatMessageTest", m);
     ASSERT_FLOAT_EQ(floatResult, data);
     ASSERT_EQ(idResult, id);
 }
@@ -70,7 +70,7 @@ TEST(PubSub, StringMessageTest){
     int id(MessageTypes::STRING);
     Message m(id, sizeof(str), &str);
     d->Subscribe("StringMessageTest", &TestClass::stringMessageTest);
-    d->Publish("StringMessageTest", &m);
+    d->Publish("StringMessageTest", m);
     ASSERT_STREQ(stringResult, str.c_str());
     ASSERT_EQ(idResult, id);
 }
@@ -82,7 +82,7 @@ TEST(PubSub, UnsubscribeTest){
     short token = d->Subscribe("UnsubscribeTest", std::bind(&TestClass::unsubscribeTest, &testClass, std::placeholders::_1));
     d->Unsubscribe("UnsubscribeTest", token);
     Message m(MessageTypes::NONE, 0, NULL);
-    d->Publish("UnsubscribeTest", &m);
+    d->Publish("UnsubscribeTest", m);
     ASSERT_STRNE(stringResult, "unsubscribe_test");
 }
 

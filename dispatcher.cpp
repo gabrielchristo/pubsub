@@ -35,7 +35,14 @@ void Dispatcher::Reset()
     m_callbacks.clear();
 }
 
-void Dispatcher::Publish(const std::string& event, Message *arg)
+void Dispatcher::Print()
+{
+    std::for_each(m_callbacks.begin(), m_callbacks.end(), [](CallbacksMapPair pair){
+        std::cout << "Event '" << pair.first << "' Callbacks: " << pair.second.size() << std::endl;
+    });
+}
+
+void Dispatcher::Publish(const std::string& event, const Message& arg)
 {
     auto list = m_callbacks[event];
     std::for_each(list.begin(), list.end(), [&arg](Callback callback){

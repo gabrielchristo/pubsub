@@ -16,13 +16,16 @@ public:
     short Subscribe(const std::string& event, FunctionPtr method);
 
     // publish event with desired message
-    void Publish(const std::string& event, Message* arg);
+    void Publish(const std::string& event, const Message& arg);
 
     // remove callback from desired event
     void Unsubscribe(const std::string& event, short id);
 
     // reset all events and subscriptions
     void Reset();
+
+    // print entries on callbacks map
+    void Print();
 
 private:
 

@@ -11,12 +11,12 @@ struct Test{
         NUMBER_OF_MESSAGE_TYPES
     }; // static enum as message identifier
 
-    static void staticCallback(Message* msg){
-        msg->Print();
+    static void staticCallback(Message msg){
+        msg.Print();
     }
 
-    void nonStaticCallback(Message* msg){
-        msg->Print();
+    void nonStaticCallback(Message msg){
+        msg.Print();
     }
 
 };
@@ -28,7 +28,8 @@ int main(int argc, char** argv)
     int number = 5;
     Message m(Test::MessageType::INT, sizeof(number), &number);
     short token = pubsub->Subscribe("event_1", &Test::staticCallback);
-    pubsub->Publish("event_1", &m);
+    pubsub->Print();
+    pubsub->Publish("event_1", m);
 
     return 0;
 }

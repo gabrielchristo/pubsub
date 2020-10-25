@@ -32,10 +32,9 @@ Class m_class;
 short token = pubsub->Subscribe("event", std::bind(&Class::callbackFunction, &m_class, std::placeholders::_1));
 ```
 
-### TO DO ###
+### TODO ###
 - set/get notify enabled
 - use fixed-size buffer instead void pointer
-- add tests: struct data, unsubscribe, reset, callback order
+- add tests: struct data, reset, callback order
 - callback priority
-- convert message pointer to const reference
-- dispatcher print table method
+- publish on readme

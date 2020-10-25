@@ -42,7 +42,7 @@ public:
 };
 
 // callback default method
-typedef std::function<void(Message*)> FunctionPtr;
+typedef std::function<void(const Message&)> FunctionPtr;
 
 // keeps function and its identifier
 class Callback{
@@ -56,5 +56,6 @@ public:
 
 // data structure to map the events and callback registrations
 typedef std::unordered_map<std::string, std::vector<Callback>> CallbacksMap;
+typedef std::pair<std::string, std::vector<Callback>> CallbacksMapPair;
 
 #endif
